@@ -482,3 +482,39 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+
+# Build artifacts
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# ASP.NET secrets
+secrets.json
+
+# Environment-specific configs
+appsettings.Development.json
+appsettings.Local.json
+
+# Logs
+*.log
+
+# Entity Framework
+Migrations/
+
+# Dotnet tools
+*.dbmdl
+*.pdb
+
+# Others
+*.DS_Store
+*.swp
+*.tmp
