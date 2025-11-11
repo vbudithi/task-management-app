@@ -23,7 +23,7 @@ namespace TaskManagement.API.Data
                     Id = 1,
                     Title = "Building first API",
                     Description = "Creating a simple REST API",
-                    Status = TaskManagement.API.Models.TaskStatus.Todo,
+                    Status = Models.TaskStatus.Todo,
                     Priority = 2,
                     CreatedAt = new DateTime(2024, 01, 01)
                 },
@@ -32,7 +32,7 @@ namespace TaskManagement.API.Data
                     Id = 2,
                     Title = "Learn ML .NET basics",
                     Description = "Inegrating ML in .NET",
-                    Status = TaskManagement.API.Models.TaskStatus.Todo,
+                    Status = Models.TaskStatus.Todo,
                     Priority = 3,
                     CreatedAt = new DateTime(2024, 01, 02)
                 }
