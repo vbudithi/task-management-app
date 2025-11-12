@@ -8,7 +8,7 @@ namespace TaskManagement.API.Services
         Task<IEnumerable<TaskItem>> GetAllTasksAsync();
         Task<TaskItem?>GetTaskByIdAsync(int id);
         Task<TaskItem> CreateTaskAsync(CreateTaskDto createDto);
-        Task<TaskItem?> UpdateTaskAsync(int id, UpdateTasksDto updateDto);
+        Task<TaskItem?> UpdateTaskAsync(int id, UpdateTaskDto updateDto);
         Task<bool> DeleteTaskAsync(int id);
         Task<IEnumerable<TaskItem>> GetTasksByStatusAsync(Models.TaskStatus status);
     }

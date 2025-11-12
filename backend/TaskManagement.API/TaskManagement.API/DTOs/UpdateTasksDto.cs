@@ -3,7 +3,7 @@ using TaskManagement.API.Models;
 
 namespace TaskManagement.API.DTOs
 {
-    public class UpdateTasksDto
+    public class UpdateTaskDto
     {
         [MaxLength(200)]
         public string? Title { get; set; }

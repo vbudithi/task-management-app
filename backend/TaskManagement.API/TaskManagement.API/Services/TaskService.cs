@@ -32,7 +32,7 @@ namespace TaskManagement.API.Services
                 Title = createDto.Title,
                 Description = createDto.Description,
                 Priority = createDto.Priority,
-                Status = Models.TaskStatus.Todo,
+                Status = createDto.Status ?? Models.TaskStatus.Todo,
                 CreatedAt = DateTime.UtcNow
             };
             _context.Tasks.Add(task);
@@ -40,7 +40,7 @@ namespace TaskManagement.API.Services
             return task;
         }
 
-        public async Task<TaskItem?> UpdateTaskAsync(int id, UpdateTasksDto updateDto)
+        public async Task<TaskItem?> UpdateTaskAsync(int id, UpdateTaskDto updateDto)
         {
             var task = await _context.Tasks.FindAsync(id);
             if (task == null) 
@@ -83,7 +83,5 @@ namespace TaskManagement.API.Services
                 .OrderByDescending(t=> t.CreatedAt)
                 .ToListAsync();
         }
-
-      
     }
 }
