@@ -16,7 +16,6 @@ namespace TaskManagement.API.Data
             base.OnModelCreating(modelBuilder);
 
             //seed data
-
             modelBuilder.Entity<TaskItem>().HasData(
                 new TaskItem
                 {

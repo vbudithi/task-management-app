@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using TaskManagement.API.Auth;
 using TaskManagement.API.Data;
 using TaskManagement.API.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,17 +11,24 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//JWT Implementation  
+builder.Configuration.AddUserSecrets<Program>();
+
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection("Jwt"));
+
 // Configure Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register services
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddSingleton<IJwtService, JwtService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowAll", policy => 
     {
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
