@@ -5,6 +5,7 @@
 
 # dotenv files
 .env
+*.env
 
 # User-specific files
 *.rsuser
@@ -115,6 +116,7 @@ ipch/
 *.opensdf
 *.sdf
 *.cachefile
+*.cache
 *.VC.db
 *.VC.VC.opendb
 
@@ -518,3 +520,16 @@ Migrations/
 *.DS_Store
 *.swp
 *.tmp
+
+# 🔐 User secrets
+secrets.json
+**/secrets.json
+
+# 🔐 Temporary key generator folder
+KeyGenerator/
+**/KeyGenerator/
+
+# 🔐 JWT key output files (if you created any)
+jwtkey.txt
+*.secret
+*.key
