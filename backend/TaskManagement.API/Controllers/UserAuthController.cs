@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.API.Auth;
 using TaskManagement.API.Data;
@@ -42,15 +43,14 @@ namespace TaskManagement.API.Controllers
                 LastName = dto.LastName,
                 Email = dto.Email,
                 Username = dto.Username,
-                PasswordHash = _HashPassword.HashPassword(dto.Password) 
+                PasswordHash = _HashPassword.HashPassword(dto.Password),
+                Role = UserRole.User
 
             };
 
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
             return Ok(new { message = "Registration successfully" });
-
-
         }
 
         //Login
@@ -80,7 +80,7 @@ namespace TaskManagement.API.Controllers
             {
                 return Unauthorized(new { message = "Invalid username or password" });
             }
-            var token = _jwtService.GenerateToken(user.Id.ToString(), user.Username);
+            var token = _jwtService.GenerateToken(user);
             return Ok(new
             {
                 token,
@@ -90,9 +90,44 @@ namespace TaskManagement.API.Controllers
                     user.FirstName,
                     user.LastName,
                     user.Email,
-                    user.Username
+                    user.Username,
+                    role=user.Role.ToString()
+                   
+                    
+                   
+                }
+            });
+        }
+
+        [Authorize(Roles ="Admin")]
+        [HttpPut("Users/{id}/role")]
+        public async Task<IActionResult> UpdateUserRole(int id, UpdateUserRoleDto dto)
+        {
+            if (id != dto.Id)
+                return BadRequest(new { message = "Route ID and body user Id doesnt match"});
+
+
+                    var user = await _db.Users.FindAsync(id);
+
+            if (user == null)
+                return NotFound(new { message = "User not found" });
+
+
+            user.Role = dto.Role;
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "User role updated successfully",
+                user = new
+                {
+                    user.Id,
+                    user.Email,
+                    user.Username,
+                    role = user.Role.ToString()
                 }
             });
         }
     }
+
 }

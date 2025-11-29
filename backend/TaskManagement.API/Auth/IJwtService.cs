@@ -1,7 +1,9 @@
-﻿namespace TaskManagement.API.Auth
+﻿using TaskManagement.API.Models;
+
+namespace TaskManagement.API.Auth
 {
     public interface IJwtService
     {
-        string GenerateToken(string userId, string username);
+        string GenerateToken(User user);
     }
 }

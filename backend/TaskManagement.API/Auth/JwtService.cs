@@ -6,6 +6,7 @@
     using System.Runtime;
     using System.Security.Claims;
     using System.Text;
+using TaskManagement.API.Models;
 
     namespace TaskManagement.API.Auth
     {
@@ -18,12 +19,14 @@
             {
                 _settings = settings.Value;
             }
-            public string GenerateToken(string userId, string username)
+            public string GenerateToken(User user)
             {
                 var claims = new[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, userId),
-                    new Claim(ClaimTypes.Name, username)
+                    new Claim(ClaimTypes.NameIdentifier, user.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Role, user.Role.ToString())
                 };
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));

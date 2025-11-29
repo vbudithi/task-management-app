@@ -1,4 +1,5 @@
 ﻿using Microsoft.Identity.Client;
+using TaskManagement.API.Models;
 
 namespace TaskManagement.API.DTOs
 {
