@@ -24,6 +24,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register services
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
+
 
 // Configure CORS
 builder.Services.AddCors(options =>

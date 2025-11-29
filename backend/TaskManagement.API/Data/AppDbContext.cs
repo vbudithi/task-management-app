@@ -11,6 +11,59 @@ namespace TaskManagement.API.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<TaskItem> Tasks { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            //User
+            modelBuilder.Entity<User>().Property(u => u.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            modelBuilder.Entity<User>().Property(u => u.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+            //Password Reset
+            modelBuilder.Entity<PasswordResetToken>().Property(u => u.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            modelBuilder.Entity<PasswordResetToken>().Property(u => u.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
+        }
+
+        public override int SaveChanges()
+        {
+            ApplyGlobalEntityRules();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken=default)
+        {
+            ApplyGlobalEntityRules();
+            return base.SaveChangesAsync(cancellationToken);
+
+        }
+
+        private void ApplyGlobalEntityRules()
+        {
+            //Apply timestamp rules
+            var entries = ChangeTracker.Entries<BaseEntity>().Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+          
+            foreach (var entry in entries)
+            {
+                entry.Entity.UpdatedAt = DateTime.UtcNow;
+
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedAt = DateTime.UtcNow;
+                }
+
+            }
+            //Normalize user emails globally
+            var userEntries = ChangeTracker.Entries<User>().Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+             foreach(var entry in userEntries)
+            {
+                entry.Entity.Email = entry.Entity.Email.ToLower().Trim();
+                entry.Entity.Username = entry.Entity.Username.ToLower().Trim();
+            }
+
+        }
+
 
         //Mock data for TaskItem
 

@@ -10,13 +10,15 @@ namespace TaskManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class UserAuthController : ControllerBase
     {
         private readonly AppDbContext _db;
         private readonly IJwtService _jwtService;
+        private readonly IPasswordHasher _HashPassword;
 
-        public AuthController(AppDbContext db, IJwtService jwtService)
+        public UserAuthController(AppDbContext db, IJwtService jwtService, IPasswordHasher HashPassword)
         {
+            _HashPassword = HashPassword;
             _db = db;
             _jwtService = jwtService;
 
@@ -25,6 +27,8 @@ namespace TaskManagement.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
+            var Email = dto.Email.ToLower().Trim();
+            var Username = dto.Username.ToLower().Trim();
 
             if (await _db.Users.AnyAsync(u => u.Email == dto.Email))
                 return BadRequest(new { message = "Email already exists" });
@@ -38,7 +42,7 @@ namespace TaskManagement.API.Controllers
                 LastName = dto.LastName,
                 Email = dto.Email,
                 Username = dto.Username,
-                PasswordHash = PasswordHasher.Hash(dto.Password)
+                PasswordHash = _HashPassword.HashPassword(dto.Password) 
 
             };
 
@@ -53,12 +57,24 @@ namespace TaskManagement.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
+      
+            var input = dto.LoginInput.ToLower().Trim();
+            User user;
 
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
+            if (input.Contains("@"))
+            {
+                //Login by email
+                user = await _db.Users.FirstOrDefaultAsync(u=>u.Email == input);
+            }
+            else
+            {
+                //Login by username
+                user = await _db.Users.FirstOrDefaultAsync(u=>u.Username == input); 
+            }
 
             if (user == null)
                 return Unauthorized(new { message = "Invalid Username or Password" });
-            var hashed = PasswordHasher.Hash(dto.Password);
+            var hashed = _HashPassword.HashPassword(dto.Password);
 
             if (hashed != user.PasswordHash)
             {
