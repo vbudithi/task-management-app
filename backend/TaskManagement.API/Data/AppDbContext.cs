@@ -64,7 +64,6 @@ namespace TaskManagement.API.Data
 
         }
 
-
         //Mock data for TaskItem
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)

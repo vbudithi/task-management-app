@@ -59,6 +59,23 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var path = context.Request.Path.Value?.ToLower();
+
+            // Allow Swagger JSON + UI to load WITHOUT JWT
+            if (path.Contains("swagger") || path.Contains("openapi"))
+            {
+                context.NoResult();
+                return Task.CompletedTask;
+            }
+
+            return Task.CompletedTask;
+        }
+    };
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -72,6 +89,7 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
+
 
 builder.Services.AddAuthorization();
 
@@ -146,7 +164,7 @@ if (app.Environment.IsDevelopment())
         c =>
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", " MyWeb API v1");
-            c.RoutePrefix = string.Empty;
+            c.RoutePrefix = "swagger";
         });
 }
 

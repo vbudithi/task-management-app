@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TaskManagement.API.Auth;
 using TaskManagement.API.Data;
 using TaskManagement.API.DTOs;
@@ -80,10 +81,16 @@ namespace TaskManagement.API.Controllers
             {
                 return Unauthorized(new { message = "Invalid username or password" });
             }
-            var token = _jwtService.GenerateToken(user);
+            var accessToken = _jwtService.GenerateToken(user);
+            var refreshToken = _jwtService.GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            await _db.SaveChangesAsync();
             return Ok(new
             {
-                token,
+                Token = accessToken,
+                RefreshToken = refreshToken,
                 user = new
                 {
                     user.Id,
@@ -92,9 +99,6 @@ namespace TaskManagement.API.Controllers
                     user.Email,
                     user.Username,
                     role=user.Role.ToString()
-                   
-                    
-                   
                 }
             });
         }
@@ -128,6 +132,43 @@ namespace TaskManagement.API.Controllers
                 }
             });
         }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh( RefreshRequestDto dto)
+        {
+            if (dto is null || string.IsNullOrEmpty(dto.Token) || string.IsNullOrEmpty(dto.RefreshToken))
+                return BadRequest(new { message = "Invalid Client request" });
+
+            var principal = _jwtService.GetPrincipalFromExpiredToken(dto.Token);
+            var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var user = await _db.Users.FindAsync(int.Parse(userId));
+
+            if (user == null || user.RefreshToken != dto.RefreshToken
+                || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            {
+                return Unauthorized(new { message = "Invalid Refresh Token" });
+            }
+
+            var newAccessToken = _jwtService.GenerateToken(user);
+            var newRefreshToken = _jwtService.GenerateRefreshToken();
+
+
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new TokenResponseDto
+            {
+
+                Token = newAccessToken,
+                RefreshToken = newRefreshToken
+
+
+            });
+
+    }
     }
 
 }
