@@ -156,26 +156,25 @@ if (builder.Configuration.GetValue<bool>("SeedAdmin"))
 }
     
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
+
     app.UseSwagger();
     app.UseSwaggerUI(
         c =>
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", " MyWeb API v1");
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", " TaskManagement API v1");
             c.RoutePrefix = "swagger";
         });
-}
 
-app.UseHttpsRedirection();
+
+// app.UseHttpsRedirection();
+
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
 
 app.UseAuthorization();
-
 
 app.MapControllers();
 
