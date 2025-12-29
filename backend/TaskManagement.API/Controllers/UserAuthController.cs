@@ -46,7 +46,6 @@ namespace TaskManagement.API.Controllers
                 Username = dto.Username,
                 PasswordHash = _HashPassword.HashPassword(dto.Password),
                 Role = UserRole.User
-
             };
 
             _db.Users.Add(user);
@@ -58,19 +57,19 @@ namespace TaskManagement.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-      
+
             var input = dto.LoginInput.ToLower().Trim();
             User user;
 
             if (input.Contains("@"))
             {
                 //Login by email
-                user = await _db.Users.FirstOrDefaultAsync(u=>u.Email == input);
+                user = await _db.Users.FirstOrDefaultAsync(u => u.Email == input);
             }
             else
             {
                 //Login by username
-                user = await _db.Users.FirstOrDefaultAsync(u=>u.Username == input); 
+                user = await _db.Users.FirstOrDefaultAsync(u => u.Username == input);
             }
 
             if (user == null)
@@ -98,20 +97,20 @@ namespace TaskManagement.API.Controllers
                     user.LastName,
                     user.Email,
                     user.Username,
-                    role=user.Role.ToString()
+                    role = user.Role.ToString()
                 }
             });
         }
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("Users/{id}/role")]
         public async Task<IActionResult> UpdateUserRole(int id, UpdateUserRoleDto dto)
         {
             if (id != dto.Id)
-                return BadRequest(new { message = "Route ID and body user Id doesnt match"});
+                return BadRequest(new { message = "Route ID and body user Id doesnt match" });
 
 
-                    var user = await _db.Users.FindAsync(id);
+            var user = await _db.Users.FindAsync(id);
 
             if (user == null)
                 return NotFound(new { message = "User not found" });
@@ -134,7 +133,7 @@ namespace TaskManagement.API.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh( RefreshRequestDto dto)
+        public async Task<IActionResult> Refresh(RefreshRequestDto dto)
         {
             if (dto is null || string.IsNullOrEmpty(dto.Token) || string.IsNullOrEmpty(dto.RefreshToken))
                 return BadRequest(new { message = "Invalid Client request" });
@@ -168,7 +167,7 @@ namespace TaskManagement.API.Controllers
 
             });
 
-    }
+        }
     }
 
 }
