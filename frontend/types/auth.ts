@@ -18,3 +18,14 @@ export interface TokenResponseDto{
     Token:string;
     RefreshToken:string;
 }
+
+// Payload for requesting a password reset link.
+export interface ForgotPasswordDto{
+    Email:string;
+}
+
+// Payload for resetting the password using the email token.
+export interface ResetPasswordDto{
+    Token:string;
+    NewPassword:string;
+}

@@ -1,5 +1,5 @@
 import apiClient from "./apiClient";
-import { LoginDto, RegisterDto, TokenResponseDto } from "@/types/auth";
+import { ForgotPasswordDto, LoginDto, RegisterDto, TokenResponseDto } from "@/types/auth";
 
 export async function loginUser(credentitals:LoginDto):Promise<TokenResponseDto>{
    const response = await apiClient.post<TokenResponseDto>("UserAuth/Login", credentitals);
@@ -7,10 +7,12 @@ export async function loginUser(credentitals:LoginDto):Promise<TokenResponseDto>
    localStorage.setItem("refreshToken", response.data.RefreshToken);
    return response.data;
 }
-export async function registerUser(data:RegisterDto):Promise<void> {
+
+export async function registerUser(data:RegisterDto) {
  await apiClient.post("UserAuth/Register", data);
 }
- export async function refreshToken():Promise<string>{
+
+export async function refreshToken():Promise<string>{
     const storedRefreshToken = localStorage.getItem("refreshToken");
     if(!storedRefreshToken)
         throw new Error("No refresh token found");
@@ -21,7 +23,12 @@ export async function registerUser(data:RegisterDto):Promise<void> {
     localStorage.setItem("accessToken", response.data.Token);
     return response.data.Token;
 }
-export function logoutUser():void{
+
+export async function forgotPassword(data:ForgotPasswordDto){
+    await apiClient.post("Password/forgot", data);
+}
+
+export function logoutUser(){
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
 }

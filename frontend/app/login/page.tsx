@@ -12,11 +12,11 @@ export default function Loginpage() {
   const router = useRouter();
   const[username, setUsername] = useState(""); 
   const[password, setPassword] = useState("");
-  const[error, setError] = useState("");
+  const[loading,setLoading] =useState(false);
 
   const handleLogin=async(e:React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setLoading(true);
     try{
       const{Token,RefreshToken} = await loginUser({ 
         LoginInput:username,
@@ -34,8 +34,7 @@ export default function Loginpage() {
          router.push("/dashboard")
 
     }catch(err:any){
-          console.error(error)
-          setError("Login Failed :" + (err.response?.data?.message || err.message))
+          toast.error("Login Failed :" + (err.response?.data?.message || "Login failed. Please try again."));
     }
   }
   return (
@@ -44,9 +43,8 @@ export default function Loginpage() {
         <CardHeader>
           <CardTitle className="text-2xl font-extrabold font-serif tracking-wide"> Log in </CardTitle>
         </CardHeader>
-        <form onSubmit={handleLogin} className="space-y-4">
-          <CardContent>
-          <div>
+        <form onSubmit={handleLogin}>
+          <CardContent className="space-y-4">
             <Input 
               type="text"
               placeholder="Username or Email"
@@ -54,21 +52,31 @@ export default function Loginpage() {
               onChange ={e=>setUsername(e.target.value)}
               required
               />
-            </div>
-            <div className="mt-4">
             <Input 
-              type="text"
+              type="password"
               placeholder="Password"
               value={password}
               onChange ={e=>setPassword(e.target.value)}
               required
               />
-          </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <CardFooter className="flex flex-col items-center space-y-2 mt-4">
-            <Button type="submit" className="w-full cursor-pointer">Log In</Button> 
+          <CardFooter className="flex flex-col items-center space-y-4">
+            <Button type="submit" disabled={loading} className="w-full cursor-pointer">
+              {loading ? "Logging in...": "Log In"}
+            </Button> 
+            <a
+              href="/forgot-password"
+              className="font-medium text-blue-700 hover:text-blue-600"
+            >
+              Forgot Password
+            </a>
             <p className="text-sm">
-             Don't have an account?, click here to <a href="/register" className="text-sm underline text-red-500 hover:text-blue-600 font-semibold">Register</a>
+              Don't have an account?{" "}
+              <a
+                href="/register"
+                className="underline text-red-500 hover:text-blue-600 font-semibold"
+              >
+               Register
+              </a>
             </p>
           </CardFooter>
         </CardContent>   
