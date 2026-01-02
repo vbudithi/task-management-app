@@ -22,7 +22,7 @@ namespace TaskManagement.API.Controllers
             var email = dto.Email.ToLower().Trim();
             var result = await _passwordResetService.GenerateResetTokenAsync(email);
 
-            if (!result)
+            if (token==null)
                 return NotFound(new { message = "Email not found" });
             return Ok(new { message = "Password reset link sent to email" });
 
