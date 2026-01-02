@@ -20,10 +20,14 @@ namespace TaskManagement.API.Controllers
         public async Task<IActionResult> Forgot(ForgotPasswordDto dto)
         {
             var email = dto.Email.ToLower().Trim();
-            var result = await _passwordResetService.GenerateResetTokenAsync(email);
+            var token = await _passwordResetService.GenerateResetTokenAsync(email);
 
             if (token==null)
                 return NotFound(new { message = "Email not found" });
+
+            // DEV ONLY: Print reset link to console for testing
+            Console.WriteLine("RESET LINK (DEV): http://localhost:3000/reset-password?token=" + token);
+
             return Ok(new { message = "Password reset link sent to email" });
 
         }
