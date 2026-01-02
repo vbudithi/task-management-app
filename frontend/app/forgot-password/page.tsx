@@ -41,8 +41,8 @@ export default function ForgotPasswordPage() {
             Enter your email and we’ll send you a password reset link.
         </CardDescription>
         </CardHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <CardContent>
+            <form onSubmit={handleSubmit} >
+                <CardContent className="space-y-4" >
                         <Input
                         type="email"
                         placeholder="Enter your Email"

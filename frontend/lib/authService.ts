@@ -1,15 +1,15 @@
 import apiClient from "./apiClient";
-import { ForgotPasswordDto, LoginDto, RegisterDto, TokenResponseDto } from "@/types/auth";
+import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto, TokenResponseDto } from "@/types/auth";
 
 export async function loginUser(credentitals:LoginDto):Promise<TokenResponseDto>{
-   const response = await apiClient.post<TokenResponseDto>("UserAuth/Login", credentitals);
+   const response = await apiClient.post<TokenResponseDto>("UserAuth/login", credentitals);
    localStorage.setItem("accessToken",  response.data.Token);
    localStorage.setItem("refreshToken", response.data.RefreshToken);
    return response.data;
 }
 
 export async function registerUser(data:RegisterDto) {
- await apiClient.post("UserAuth/Register", data);
+ await apiClient.post("UserAuth/register", data);
 }
 
 export async function refreshToken():Promise<string>{
@@ -26,6 +26,9 @@ export async function refreshToken():Promise<string>{
 
 export async function forgotPassword(data:ForgotPasswordDto){
     await apiClient.post("Password/forgot", data);
+}
+export async function resetPassword(data:ResetPasswordDto){
+    return await apiClient.post("Password/reset", data);
 }
 
 export function logoutUser(){
