@@ -163,11 +163,71 @@ namespace TaskManagement.API.Controllers
 
                 Token = newAccessToken,
                 RefreshToken = newRefreshToken
-
-
             });
+        }
 
+        [Authorize]
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var user = await _db.Users
+                .Where(u => u.Id == int.Parse(userId))
+                .Select(u => new
+                {
+                    u.Id,
+                    u.Email,
+                    u.FirstName,
+                    u.LastName,
+                    u.Username,
+                    u.CreatedAt
+                })
+                .FirstOrDefaultAsync();
+
+            if (user == null) return NotFound(new { message = "User not found" });
+
+            return Ok(user);
+        }
+
+        [Authorize]
+        [HttpPut("updateProfile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (email == null)
+                return Unauthorized();
+
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                return NotFound();
+
+            // Validate email uniqueness by excluding the current user's record
+            var emailExists = await _db.Users.AnyAsync(u =>
+                u.Email == dto.Email && u.Id != user.Id);
+
+            if (emailExists)
+                return BadRequest(new { message = "Email already in use" });
+
+            user.FirstName = dto.FirstName;
+            user.LastName = dto.LastName;
+            user.Email = dto.Email;
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Profile updated",
+                profile = new
+                {
+                    user.Id,
+                    user.FirstName,
+                    user.LastName,
+                    user.Email,
+                    user.Username
+                }
+            });
         }
     }
-
 }
