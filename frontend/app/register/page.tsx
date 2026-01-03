@@ -30,6 +30,7 @@ export default function RegisterPage() {
         Password: password,
       })
       console.log(firstName, lastName, email, username, password)
+      toast.dismiss();
       toast.success("Registered successfully", {
         className: "toast-progress",
       });

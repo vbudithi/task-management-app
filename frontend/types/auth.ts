@@ -15,8 +15,16 @@ export interface RegisterDto{
 
 // Tokens returned by the API after successful authentication.
 export interface TokenResponseDto{
-    Token:string;
-    RefreshToken:string;
+    token:string;
+    refreshToken:string;
+    user:{
+        id: number;
+        username: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        role:string;
+    }
 }
 
 // Payload for requesting a password reset link.
@@ -28,4 +36,10 @@ export interface ForgotPasswordDto{
 export interface ResetPasswordDto{
     Token:string;
     NewPassword:string;
+}
+
+export interface UpdateProfileDto{
+    firstName:string;
+    lastName:string;
+    email:string;
 }

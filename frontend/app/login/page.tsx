@@ -18,16 +18,21 @@ export default function Loginpage() {
     e.preventDefault();
     setLoading(true);
     try{
-      const{Token,RefreshToken} = await loginUser({ 
-        LoginInput:username,
+       const res = await loginUser({
+        LoginInput: username,
         Password: password,
       });
-      console.log(username, password)
 
-      //store token
-      localStorage.setItem("token", Token);
-      localStorage.setItem("refreshToken", RefreshToken);
-      console.log("Login Successful")
+      console.log("Login response:", res);
+      
+      const { token, refreshToken, user } = res;
+      
+      //save token
+      localStorage.setItem("token", token);
+      localStorage.setItem("refreshToken", refreshToken);
+
+      localStorage.setItem("user", JSON.stringify(user));
+      console.log("Saved token:", localStorage.getItem("token"));
       toast.success("Logged in successfully", {
           className: "toast-progress",
         });

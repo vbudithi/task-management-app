@@ -1,10 +1,10 @@
 import apiClient from "./apiClient";
-import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto, TokenResponseDto } from "@/types/auth";
+import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto, TokenResponseDto, UpdateProfileDto } from "@/types/auth";
 
 export async function loginUser(credentitals:LoginDto):Promise<TokenResponseDto>{
    const response = await apiClient.post<TokenResponseDto>("UserAuth/login", credentitals);
-   localStorage.setItem("accessToken",  response.data.Token);
-   localStorage.setItem("refreshToken", response.data.RefreshToken);
+   localStorage.setItem("accessToken",  response.data.token);
+   localStorage.setItem("refreshToken", response.data.refreshToken);
    return response.data;
 }
 
@@ -20,8 +20,8 @@ export async function refreshToken():Promise<string>{
         refreshToken : storedRefreshToken
     
     });
-    localStorage.setItem("accessToken", response.data.Token);
-    return response.data.Token;
+    localStorage.setItem("accessToken", response.data.token);
+    return response.data.token;
 }
 
 export async function forgotPassword(data:ForgotPasswordDto){
@@ -35,3 +35,11 @@ export function logoutUser(){
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
 }
+
+export function getProfile(){
+    return apiClient.get("UserAuth/profile");
+}
+export async function updateProfile(data:UpdateProfileDto){
+    return await apiClient.put("UserAuth/updateProfile", data);
+}
+
