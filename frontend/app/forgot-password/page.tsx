@@ -54,6 +54,24 @@ export default function ForgotPasswordPage() {
                     </Button>
                 </CardContent>
             </form>
+              <div className=" flex flex-col items-center space-y-2">
+            <a
+              href="/login"
+              className="font-medium text-blue-700 hover:text-blue-600"
+            >
+               Back to Login
+
+            </a>
+            <p className="text-sm">
+              Don't have an account?{" "}
+              <a
+                href="/register"
+                className="underline text-red-500 hover:text-blue-600 font-semibold"
+              >
+               Register
+              </a>
+            </p>
+            </div>
         </Card>
     </div>
   )

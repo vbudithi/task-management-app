@@ -2,15 +2,16 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
-import { getProfile } from "@/lib/authService";
+import { getProfile, logoutUser } from "@/lib/authService";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const loadUser = async () => {
-      const token = localStorage.getItem("token");
-      console.log(token, "token-dashboardpage");
-      if (!token) return (window.location.href = "/login");
       try {
         const res = await getProfile();
         const data = res.data;
@@ -23,6 +24,20 @@ export default function DashboardPage() {
     };
     loadUser();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+      await logoutUser();
+      toast.success("Logged out Successfully");
+      router.push("/login");
+    } catch (error) {
+      toast.error("Logout failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -37,6 +52,13 @@ export default function DashboardPage() {
               View Profile
             </button>
           </Link>
+
+          <Button
+            onClick={handleLogout}
+            className="mt-4 px-4 py-2 bg-gray-600 text-white rounded cursor-pointer"
+          >
+            {loading ? "Logging out..." : "Logout"}
+          </Button>
         </div>
       )}
     </div>

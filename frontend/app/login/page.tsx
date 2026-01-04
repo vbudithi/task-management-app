@@ -18,28 +18,17 @@ export default function Loginpage() {
     e.preventDefault();
     setLoading(true);
     try{
-       const res = await loginUser({
+     await loginUser({
         LoginInput: username,
         Password: password,
       });
+      toast.success("Logged in successfully");
+      router.push("/dashboard")
 
-      console.log("Login response:", res);
-      
-      const { token, refreshToken, user } = res;
-      
-      //save token
-      localStorage.setItem("token", token);
-      localStorage.setItem("refreshToken", refreshToken);
-
-      localStorage.setItem("user", JSON.stringify(user));
-      console.log("Saved token:", localStorage.getItem("token"));
-      toast.success("Logged in successfully", {
-          className: "toast-progress",
-        });
-         router.push("/dashboard")
-
-    }catch(err:any){
-          toast.error("Login Failed :" + (err.response?.data?.message || "Login failed. Please try again."));
+    }catch(error){
+          toast.error("Login Failed : Invalid credentials");
+    }finally{
+      setLoading(false);
     }
   }
   return (

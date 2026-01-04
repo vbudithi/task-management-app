@@ -17,10 +17,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem("token");
-      console.log(token, "token-ProfilePage");
-
-      if (!token) return (window.location.href = "/login");
+      setLoading(true)
       try {
         const res = await getProfile();
         const data = res.data;
@@ -39,7 +36,9 @@ export default function ProfilePage() {
     fetchProfile();
   }, []);
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (e:React.FormEvent) => {
+     e.preventDefault();
+       setLoading(true);
     try {
       await updateProfile({ firstName, lastName, email });
        toast.dismiss();
@@ -49,15 +48,17 @@ export default function ProfilePage() {
     } catch (error) {
       console.error("update failed", error);
       toast.error("Failed to update the profile")
+    }finally{
+      setLoading(false);
     }
   }
-  
+
   return (
     <Card className="max-w-lg mx-auto mt-10 p-6">
       <CardHeader>
         <CardTitle> My Profile</CardTitle>
       </CardHeader>
-      <form>
+      <form onSubmit={handleUpdate}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="firstName">First Name</Label>
@@ -88,12 +89,12 @@ export default function ProfilePage() {
               onChange={e => setUsername(e.target.value)} disabled />
           </div>
         </CardContent>
-      </form>
       <CardFooter>
-        <Button variant="outline" className="cursor-pointer" onClick={handleUpdate}>
-          Update
+        <Button variant="outline" disabled={loading} className=" w-full cursor-pointer" >
+          {loading? "updating...":"Update"}
         </Button>
       </CardFooter>
+      </form>
     </Card>
   )
 }

@@ -86,6 +86,26 @@ namespace TaskManagement.API.Controllers
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             await _db.SaveChangesAsync();
+
+            // HttpOnly cookies
+            Response.Cookies.Append("accessToken", accessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddMinutes(30)
+            });
+
+            Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = "/",
+                Expires = DateTime.UtcNow.AddDays(7)
+            });
+
             return Ok(new
             {
                 Token = accessToken,
@@ -100,6 +120,16 @@ namespace TaskManagement.API.Controllers
                     role = user.Role.ToString()
                 }
             });
+        }
+
+        //logout
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            Response.Cookies.Delete("accessToken");
+            Response.Cookies.Delete("refreshToken");
+
+            return Ok(new { message = "Logged out Successfully" });
         }
 
         [Authorize(Roles = "Admin")]

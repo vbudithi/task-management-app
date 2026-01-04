@@ -66,10 +66,18 @@ builder.Services.AddAuthentication(options =>
             var path = context.Request.Path.Value?.ToLower();
 
             // Allow Swagger JSON + UI to load WITHOUT JWT
-            if (path.Contains("swagger") || path.Contains("openapi"))
+            if ((path != null && path.Contains("swagger")) || path.Contains("openapi"))
             {
-                context.NoResult();
+              
                 return Task.CompletedTask;
+            }
+
+            //  READ JWT FROM COOKIE
+            var token = context.Request.Cookies["accessToken"];
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                context.Token = token;
             }
 
             return Task.CompletedTask;
@@ -114,11 +122,12 @@ builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 // Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy => 
+    options.AddPolicy("AllowFrontend", policy => 
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:3000")
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -170,7 +179,7 @@ if (builder.Configuration.GetValue<bool>("SeedAdmin"))
 
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 
