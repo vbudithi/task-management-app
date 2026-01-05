@@ -3,11 +3,10 @@ import Link from 'next/link'
 export default function Footer() {
     const currentYear = new Date().getFullYear();
   return (
-   <footer className="bg-gray-200 py-4">
-      <div className="container mx-auto flex items-center justify-center space-x-3">
-        <p className="text-sm text-gray-600 text-center">
+    <footer className="h-15 flex items-center justify-center px-6 text-white bg-blue-600 shadow-sm">
+        <p className="text-sm text-white-600 text-center">
           &copy; {currentYear}{" "}
-          <Link href="/" className="hover:text-blue-600 font-semibold">
+          <Link href="/" className="hover:text-red-300 font-semibold">
             TaskFlow
           </Link>{" "}
           | Designed and Developed by{" "}
@@ -15,12 +14,11 @@ export default function Footer() {
             href="https://github.com/vbudithi"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-blue-600 font-semibold"
+            className="hover:text-red-300 font-semibold"
           >
             Vivek Budithi
           </a>
         </p>
-      </div>
     </footer>
   )
 }
