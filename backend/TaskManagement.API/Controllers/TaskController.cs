@@ -57,7 +57,16 @@ namespace TaskManagement.API.Controllers
         [HttpGet("status/{status}")]
         public async Task<ActionResult<IEnumerable<TaskItem>>> GetTasksByStatus(Models.TaskStatus status)
         {
-            var tasks = await _taskService.GetTasksByStatusAsync(status);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return Unauthorized();
+
+            int userId = int.Parse(userIdClaim);
+            
+            var tasks = await _taskService.GetTasksByStatusAsync(userId, status);
             return Ok(tasks);
         }
 

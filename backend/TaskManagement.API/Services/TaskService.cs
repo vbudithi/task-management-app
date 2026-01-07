@@ -85,10 +85,10 @@ namespace TaskManagement.API.Services
             return true;
         }
 
-        public async Task<IEnumerable<TaskItem>> GetTasksByStatusAsync(Models.TaskStatus status)
+        public async Task<IEnumerable<TaskItem>> GetTasksByStatusAsync(int userId, Models.TaskStatus status)
         {
             return await _context.Tasks
-                .Where(t =>t.Status == status)
+                .Where(t =>t.UserId==userId && t.Status ==status)
                 .OrderByDescending(t=> t.CreatedAt)
                 .ToListAsync();
         }

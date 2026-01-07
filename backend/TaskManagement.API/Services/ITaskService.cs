@@ -10,6 +10,6 @@ namespace TaskManagement.API.Services
         Task<TaskItem> CreateTaskAsync(CreateTaskDto createDto, int userId);
         Task<TaskItem?> UpdateTaskAsync(int userId, int taskId, UpdateTaskDto updateDto);
         Task<bool> DeleteTaskAsync(int id);
-        Task<IEnumerable<TaskItem>> GetTasksByStatusAsync(Models.TaskStatus status);
+        Task<IEnumerable<TaskItem>> GetTasksByStatusAsync(int userId, Models.TaskStatus status);
     }
 }
