@@ -59,18 +59,21 @@ namespace TaskManagement.API.Controllers
         {
 
             var input = dto.LoginInput.ToLower().Trim();
-            User user;
+            User? user;
 
-            if (input.Contains("@"))
-            {
-                //Login by email
-                user = await _db.Users.FirstOrDefaultAsync(u => u.Email == input);
-            }
-            else
-            {
-                //Login by username
-                user = await _db.Users.FirstOrDefaultAsync(u => u.Username == input);
-            }
+            user = await _db.Users.FirstOrDefaultAsync(
+                u => input.Contains("@")? u.Email.ToLower() == input : u.Username.ToLower() == input);
+
+            //if (input.Contains("@"))
+            //{
+            //    //Login by email
+            //   user = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == input);
+            //}
+            //else
+            //{
+            //    //Login by username
+            //    user = await _db.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == input);
+            //}
 
             if (user == null)
                 return Unauthorized(new { message = "Invalid Username or Password" });
@@ -129,6 +132,8 @@ namespace TaskManagement.API.Controllers
             Response.Cookies.Delete("accessToken");
             Response.Cookies.Delete("refreshToken");
 
+            await Task.CompletedTask;
+
             return Ok(new { message = "Logged out Successfully" });
         }
 
@@ -169,9 +174,15 @@ namespace TaskManagement.API.Controllers
                 return BadRequest(new { message = "Invalid Client request" });
 
             var principal = _jwtService.GetPrincipalFromExpiredToken(dto.Token);
-            var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userIdString = principal?.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var user = await _db.Users.FindAsync(int.Parse(userId));
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var userId = int.Parse(userIdString);
+            var user = await _db.Users.FindAsync(userId);
 
             if (user == null || user.RefreshToken != dto.RefreshToken
                 || user.RefreshTokenExpiryTime <= DateTime.UtcNow)

@@ -5,21 +5,18 @@ namespace TaskManagement.API.Models
     public class TaskItem
     {
         public int Id { get; set; }
-
-        [Required]
         [MaxLength(200)]
-        public string Title { get; set; }
-
+        public required string Title { get; set; }
         [MaxLength(1000)]
-        public string Description { get; set; }
-
-        public TaskStatus Status { get; set; } = TaskStatus.Todo;
+        public string? Description { get; set; }
+        public required TaskStatus? Status { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
         public DateTime CompletedAt { get; set; }
-
-        [Required]
-        public int Priority { get; set; } = 1; // 1=Low, 2=Medium, 3=High
-
+        public DateTime? UpdatedAt { get; set; }
+        [Range(1, 3)]
+        public int? Priority { get; set; }
+        public int? UserId { get; set; }
+        public User? User { get; set; }
+        public DateTime? DueDate { get; set; }
     }
 }

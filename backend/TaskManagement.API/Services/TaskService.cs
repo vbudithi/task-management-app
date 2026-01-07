@@ -14,18 +14,21 @@ namespace TaskManagement.API.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<TaskItem>> GetAllTasksAsync()
+        public async Task<IEnumerable<TaskItem>> GetAllTasksAsync(int userId)
         {
             return await _context.Tasks
+                .Where(t=>t.UserId==userId)
                 .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync();
         }
-        public async Task<TaskItem?> GetTaskByIdAsync(int id)
+        public async Task<TaskItem?> GetTaskByIdAsync(int userId, int taskId)
         {
-            return await _context.Tasks.FindAsync(id);
+            return await _context.Tasks
+                   .Where(t => t.Id == taskId && t.UserId == userId)
+                   .FirstOrDefaultAsync();
         }
 
-        public async Task<TaskItem> CreateTaskAsync(CreateTaskDto createDto)
+        public async Task<TaskItem> CreateTaskAsync(CreateTaskDto createDto, int userId)
         {
             var task = new TaskItem
             {
@@ -33,16 +36,19 @@ namespace TaskManagement.API.Services
                 Description = createDto.Description,
                 Priority = createDto.Priority,
                 Status = createDto.Status ?? Models.TaskStatus.Todo,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UserId= userId,
+                DueDate =createDto.DueDate
             };
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();
             return task;
         }
 
-        public async Task<TaskItem?> UpdateTaskAsync(int id, UpdateTaskDto updateDto)
+        public async Task<TaskItem?> UpdateTaskAsync(int userId, int taskId, UpdateTaskDto updateDto)
         {
-            var task = await _context.Tasks.FindAsync(id);
+            var task = await _context.Tasks
+                .FirstOrDefaultAsync(t=>t.Id==taskId && t.UserId ==userId);
             if (task == null) 
                 return null;
 
@@ -60,7 +66,11 @@ namespace TaskManagement.API.Services
             }
             if(updateDto.Priority.HasValue)
                 task.Priority = updateDto.Priority.Value;
-            
+
+            if (updateDto.DueDate.HasValue)
+                task.DueDate = updateDto.DueDate.Value;
+
+               task.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
             return task;
@@ -74,7 +84,6 @@ namespace TaskManagement.API.Services
             await _context.SaveChangesAsync();
             return true;
         }
-
 
         public async Task<IEnumerable<TaskItem>> GetTasksByStatusAsync(Models.TaskStatus status)
         {

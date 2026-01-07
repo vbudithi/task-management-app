@@ -4,7 +4,6 @@ using TaskManagement.API.Models;
 namespace TaskManagement.API.Data
 {
     public class AppDbContext : DbContext
-
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
@@ -17,13 +16,20 @@ namespace TaskManagement.API.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            //User
+            //User timestamps
             modelBuilder.Entity<User>().Property(u => u.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
             modelBuilder.Entity<User>().Property(u => u.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
 
-            //Password Reset
+            //Password Reset timestamps
             modelBuilder.Entity<PasswordResetToken>().Property(u => u.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
             modelBuilder.Entity<PasswordResetToken>().Property(u => u.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+            //Relationship between User and timestamps
+            modelBuilder.Entity<TaskItem>()
+                .HasOne(t => t.User) //each TaskItem has one user
+                .WithMany(u => u.Tasks)   // each User can have many tasks 
+                .HasForeignKey(t=> t.UserId) //foreign key in TaskItem
+                .OnDelete(DeleteBehavior.SetNull); //delete tasks if user is deleted
         }
 
         public override int SaveChanges()

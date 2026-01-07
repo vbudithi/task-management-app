@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using TaskManagement.API.Data;
 using TaskManagement.API.DTOs;
 using TaskManagement.API.Models;
 using TaskManagement.API.Services;
@@ -10,17 +13,24 @@ namespace TaskManagement.API.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ITaskService _taskService;
+        private readonly AppDbContext _db;
 
-        public TaskController(ITaskService taskService)
+        public TaskController(AppDbContext db , ITaskService taskService)
         {
             _taskService = taskService;
+            _db = db;
         }
 
         //GET: api/tasks
         [HttpGet]
-        public async Task<ActionResult<TaskItem>> GetTasks()
+        public async Task<ActionResult<TaskItem>> GetAllTasks()
         {
-            var tasks = await _taskService.GetAllTasksAsync();
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            int userId = int.Parse(userIdClaim);
+            var tasks = await _taskService.GetAllTasksAsync(userId);
             return Ok(tasks);
 
         }
@@ -29,10 +39,16 @@ namespace TaskManagement.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TaskItem>> GetTasks(int id)
         {
-            var task = await _taskService.GetTaskByIdAsync(id);
+
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            int userId = int.Parse(userIdClaim);
+            var task = await _taskService.GetTaskByIdAsync(userId, id);
 
             if (task == null)
-                return NotFound(new { message = $"Task with id {id} not found" });
+                return NotFound(new { message = $"Task with id {id} not found or access denied" });
 
             return Ok(task);
         }
@@ -52,9 +68,36 @@ namespace TaskManagement.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var task = await _taskService.CreateTaskAsync(createDto);
-            return CreatedAtAction(nameof(GetTasks), new { id = task.Id }, task);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
 
+            var task = new TaskItem
+            {
+                Title = createDto.Title,
+                Description = createDto.Description,
+                Priority = createDto.Priority,
+                Status = createDto.Status ?? Models.TaskStatus.Todo,
+                CreatedAt = DateTime.UtcNow,
+                UserId = int.Parse(userId),
+                DueDate= createDto.DueDate
+            };
+
+            _db.Tasks.Add(task);
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Task Created",
+                task = new
+                {
+                    task.Title,
+                    task.Description,
+                    task.Priority,
+                    task.Status,
+                    task.CreatedAt,
+                    task.DueDate
+                }
+            });
         }
 
         //PUT: api/tasks/id
@@ -64,11 +107,32 @@ namespace TaskManagement.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var task = await _taskService.UpdateTaskAsync(id, updateDto);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return BadRequest(ModelState);
+
+            var userId = int.Parse(userIdClaim);
+
+            var task = await _taskService.UpdateTaskAsync(userId, id, updateDto);
 
             if (task == null)
-                return NotFound(new { message = $"Task with id {id} not found" });
-            return Ok(task);
+                return NotFound(new { message = "Task not found or access denied" });
+
+            return Ok(new
+            {
+                message = "Task Updated Successfully",
+                task = new
+                {
+                    task.Id,
+                    task.Title,
+                    task.Description,
+                    task.Priority,
+                    task.Status,
+                    task.CreatedAt,
+                    task.DueDate,
+                    task.UpdatedAt
+                }
+            });
         }
 
         //DELETE:api/tasks/id
