@@ -7,24 +7,24 @@ import { Pencil, Trash2 } from "lucide-react";
 
 export function TaskCard({ task }: { task: Task }) {
   return (
-    <Card className="shadow-2xs rounded-xl border border-gray-300 hover:shadow-lg transition-all duration-200 cursor-pointer">
-      <CardHeader className="space-y-1 pb-2">
+    <Card className="p-1.5 w-full shadow-2xs rounded-xl border border-gray-300 hover:shadow-lg transition-all duration-200 cursor-pointer">
+      <CardHeader className="space-y-0.5 pb-1">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-lg font-semibold leading-tight line-clamp-1">
+            <CardTitle className="text-xl font-semibold line-clamp-1 mb-2">
               {task.title}
             </CardTitle>
-            <CardDescription className="text-sm text-muted-foreground line-clamp-2">
+            <CardDescription className="text-muted-foreground line-clamp-2">
               {task.description}
             </CardDescription>
           </div>
           <Badge variant="outline" className="text-xs px-2 py-1">
-            {task.status === 0 ? "To Do" : task.status === 1 ? "In Progress" : "Done"}
+            {task.status === 0 ? "To Do" : task.status === 1 ? "In Progress" : "Completed"}
           </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="text-sm text-gray-600 space-y-1">
+      <CardContent className="text-sm text-gray-600 space-y-0.5">
         <div>
           <span className="font-medium">Priority:</span> {task.priority}
         </div>
@@ -34,10 +34,10 @@ export function TaskCard({ task }: { task: Task }) {
       </CardContent>
 
       <CardFooter className="flex justify-end gap-2 pt-2">
-        <Button size="sm" variant="outline" className="flex items-center gap-1">
+        <Button size="sm" variant="outline" className="flex items-center gap-1 px-2 py-1 text-xs cursor-pointer hover:bg-gray-200">
           <Pencil className="w-4 h-4" /> Edit
         </Button>
-        <Button size="sm" variant="destructive" className="flex items-center gap-1">
+        <Button size="sm" variant="destructive" className="flex items-center gap-1 px-2 py-1 text-xs cursor-pointer hover:bg-red-700 ">
           <Trash2 className="w-4 h-4" /> Delete
         </Button>
       </CardFooter>
