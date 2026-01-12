@@ -68,6 +68,7 @@ useEffect(() => {
     }
   };
 
+
   return(
     <>
        {user && (
@@ -87,7 +88,7 @@ useEffect(() => {
               </div>
             </div>
           )}
-        <div className="text-2xl md:text-4xl font-bold md:text-center -translate-y-18 ">Dashboard</div>
+        <div className="text-xl md:text-3xl font-bold md:text-center -translate-y-18 ">Dashboard</div>
 
         {/* loading state */}
             {loading && (

@@ -32,7 +32,7 @@ export const LoginForm = () => {
     }
   }
   return (
-    <div className="min-h-screen flex items-center justify-center" >
+    <div className="w-full flex items-center justify-center" >
       <Card className="max-w-lg w-full min-h-[30vh] flex flex-col justify-center">
         <CardHeader>
           <CardTitle className="text-2xl font-extrabold font-serif tracking-wide"> Log in </CardTitle>

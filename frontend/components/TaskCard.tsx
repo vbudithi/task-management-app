@@ -18,7 +18,10 @@ export function TaskCard({ task }: { task: Task }) {
               {task.description}
             </CardDescription>
           </div>
-          <Badge variant="outline" className="text-xs px-2 py-1">
+          <Badge variant="outline" className={`text-xs px-2 py-1 text-white
+            ${task.status===0 ? "bg-blue-600":""}
+            ${task.status ===1 ? "bg-yellow-600":""}
+            ${task.status===2 ? "bg-green-600":""}`}>
             {task.status === 0 ? "To Do" : task.status === 1 ? "In Progress" : "Completed"}
           </Badge>
         </div>
