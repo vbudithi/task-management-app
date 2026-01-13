@@ -50,7 +50,7 @@ export const TaskColumns = ({ tasks }: TaskColumnsProps) => {
       </div>
 
       {/* DESKTOP VIEW */}
-      <div className="hidden md:flex justify-center px:2 gap-20 -mt-12">
+      <div className="hidden md:flex justify-center px:2 gap-20 -mt-12 h-180">
         {statuses.map((status) => (
           <div key={status} className="min-w-70 shrink-0 flex flex-col items-center bg-white rounded-lg p-3 border shadow-sm">
             <h3 className=

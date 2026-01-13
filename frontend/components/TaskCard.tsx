@@ -2,10 +2,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Task } from '@/types/taskTypes';
 import { Button } from './ui/button';
 import { Badge } from "./ui/badge";
-import { format } from "date-fns";
 import { Pencil, Trash2 } from "lucide-react";
-
+import { dateFormat } from '@/components/dateFormat'
 export function TaskCard({ task }: { task: Task }) {
+
   return (
     <Card className="p-1.5 w-full shadow-2xs rounded-xl border border-gray-300 hover:shadow-lg transition-all duration-200 cursor-pointer">
       <CardHeader className="space-y-0.5 pb-1">
@@ -19,9 +19,9 @@ export function TaskCard({ task }: { task: Task }) {
             </CardDescription>
           </div>
           <Badge variant="outline" className={`text-xs px-2 py-1 text-white
-            ${task.status===0 ? "bg-blue-600":""}
-            ${task.status ===1 ? "bg-yellow-600":""}
-            ${task.status===2 ? "bg-green-600":""}`}>
+            ${task.status === 0 ? "bg-blue-600" : ""}
+            ${task.status === 1 ? "bg-yellow-600" : ""}
+            ${task.status === 2 ? "bg-green-600" : ""}`}>
             {task.status === 0 ? "To Do" : task.status === 1 ? "In Progress" : "Completed"}
           </Badge>
         </div>
@@ -32,7 +32,7 @@ export function TaskCard({ task }: { task: Task }) {
           <span className="font-medium">Priority:</span> {task.priority}
         </div>
         <div>
-          <span className="font-medium">Due:</span> {format(new Date(), "MMM d, yyyy")}
+          <span className="font-medium">Due:</span> {dateFormat(task.dueDate)}
         </div>
       </CardContent>
 
