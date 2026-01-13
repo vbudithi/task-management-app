@@ -4,8 +4,24 @@ import { Button } from './ui/button';
 import { Badge } from "./ui/badge";
 import { Pencil, Trash2 } from "lucide-react";
 import { dateFormat } from '@/components/dateFormat'
-export function TaskCard({ task }: { task: Task }) {
 
+type Props = {
+  task: Task;
+  onOpen: (task: Task) => void;
+  onDelete: (task: Task) => void;
+}
+
+export function TaskCard({ task, onOpen, onDelete }: Props) {
+
+  const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    onOpen(task)
+  }
+
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    onDelete(task)
+  }
   return (
     <Card className="p-1.5 w-full shadow-2xs rounded-xl border border-gray-300 hover:shadow-lg transition-all duration-200 cursor-pointer">
       <CardHeader className="space-y-0.5 pb-1">
@@ -37,10 +53,20 @@ export function TaskCard({ task }: { task: Task }) {
       </CardContent>
 
       <CardFooter className="flex justify-end gap-2 pt-2">
-        <Button size="sm" variant="outline" className="flex items-center gap-1 px-2 py-1 text-xs cursor-pointer hover:bg-gray-200">
+        <Button
+          size="sm"
+          variant="outline"
+          className="flex items-center gap-1 px-2 py-1 text-xs cursor-pointer hover:bg-gray-200"
+          onClick={handleEdit}
+        >
           <Pencil className="w-4 h-4" /> Edit
         </Button>
-        <Button size="sm" variant="destructive" className="flex items-center gap-1 px-2 py-1 text-xs cursor-pointer hover:bg-red-700 ">
+        <Button
+          size="sm"
+          variant="destructive"
+          className="flex items-center gap-1 px-2 py-1 text-xs cursor-pointer hover:bg-red-700 "
+          onClick={handleDelete}
+        >
           <Trash2 className="w-4 h-4" /> Delete
         </Button>
       </CardFooter>

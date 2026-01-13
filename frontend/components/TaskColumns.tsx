@@ -1,5 +1,8 @@
 import { Task } from "@/types/taskTypes";
 import { TaskCard } from "@/components/TaskCard";
+import { useState } from "react";
+import TaskDetailsDialog from "./TaskDetailsDialog";
+import DeleteTaskDialog from "./DeleteTaskDialog";
 
 interface TaskColumnsProps {
   tasks: Task[];
@@ -13,6 +16,11 @@ const statusMap: Record<number, string> = {
 };
 
 export const TaskColumns = ({ tasks }: TaskColumnsProps) => {
+  const handleDelete = async () => {
+    if (!deleteTask) return;
+  }
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);;
+  const [deleteTask, setDeleteTask] = useState<Task | null>(null);
   const groupedTasks = statuses.reduce((acc: Record<string, Task[]>, status) => {
     acc[status] = tasks.filter((t) => statusMap[t.status] === status);
     return acc;
@@ -20,7 +28,7 @@ export const TaskColumns = ({ tasks }: TaskColumnsProps) => {
   return (
     <>
       {/* MOBILE VIEW */}
-      <div className="flex md:hidden overflow-x-auto gap-4 px-2">
+      <div className="flex md:hidden overflow-x-auto gap-4 px-2 h-150">
         {statuses.map((status) => (
           <div
             key={status}
@@ -39,7 +47,12 @@ export const TaskColumns = ({ tasks }: TaskColumnsProps) => {
             <div className="w-66 flex-1 overflow-y-auto pr-2 space-y-5">
               {groupedTasks[status]?.length > 0 ? (
                 groupedTasks[status].map((task) => (
-                  <TaskCard key={task.id} task={task} />
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onOpen={(task) => setSelectedTask(task)}
+                    onDelete={(task) => setDeleteTask(task)}
+                  />
                 ))
               ) : (
                 <p className="text-sm text-gray-500 text-center">No tasks here</p>
@@ -64,12 +77,29 @@ export const TaskColumns = ({ tasks }: TaskColumnsProps) => {
             <div className="w-80 flex-1 overflow-y-auto pr-2 space-y-5">
               {groupedTasks[status]?.length > 0 ? (
                 groupedTasks[status].map((task) => (
-                  <TaskCard key={task.id} task={task} />
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onOpen={(task) => setSelectedTask(task)}
+                    onDelete={(task) => setDeleteTask(task)}
+                  />
                 ))
               ) : (
                 <p className="text-sm text-gray-500 text-center">No tasks here</p>
               )}
             </div>
+            <TaskDetailsDialog
+              open={!!selectedTask}
+              task={selectedTask || undefined}
+              onClose={() => setSelectedTask(null)
+              }
+            />
+            <DeleteTaskDialog
+              open={!!deleteTask}
+              task={deleteTask || undefined}
+              onClose={() => setDeleteTask(null)}
+              onConfirm={handleDelete}
+            />
           </div>
         ))}
       </div>
