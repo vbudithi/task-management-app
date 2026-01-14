@@ -3,28 +3,30 @@ import { TaskCard } from "@/components/TaskCard";
 import { useState } from "react";
 import TaskDetailsDialog from "./TaskDetailsDialog";
 import DeleteTaskDialog from "./DeleteTaskDialog";
+import EditTaskDialog from "./EditTaskDialog";
 
 interface TaskColumnsProps {
   tasks: Task[];
+  onDeleteTask: (task: Task) => void
+  onUpdateTask: (task: Task) => void
 }
 
-const statuses = ["To Do", "In Progress", "Completed"];
-const statusMap: Record<number, string> = {
-  0: "To Do",
-  1: "In Progress",
-  2: "Completed",
-};
-
-export const TaskColumns = ({ tasks }: TaskColumnsProps) => {
-  const handleDelete = async () => {
-    if (!deleteTask) return;
-  }
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);;
+export const TaskColumns = ({ tasks, onDeleteTask, onUpdateTask }: TaskColumnsProps) => {
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [updateTask, setUpdateTask] = useState<Task | null>(null);
   const [deleteTask, setDeleteTask] = useState<Task | null>(null);
+
+  const statuses = ["To Do", "In Progress", "Completed"];
+  const statusMap: Record<number, string> = {
+    0: "To Do",
+    1: "In Progress",
+    2: "Completed",
+  };
   const groupedTasks = statuses.reduce((acc: Record<string, Task[]>, status) => {
     acc[status] = tasks.filter((t) => statusMap[t.status] === status);
     return acc;
   }, {});
+
   return (
     <>
       {/* MOBILE VIEW */}
@@ -51,6 +53,7 @@ export const TaskColumns = ({ tasks }: TaskColumnsProps) => {
                     key={task.id}
                     task={task}
                     onOpen={(task) => setSelectedTask(task)}
+                    onUpdate={(task) => setUpdateTask(task)}
                     onDelete={(task) => setDeleteTask(task)}
                   />
                 ))
@@ -58,6 +61,7 @@ export const TaskColumns = ({ tasks }: TaskColumnsProps) => {
                 <p className="text-sm text-gray-500 text-center">No tasks here</p>
               )}
             </div>
+
           </div>
         ))}
       </div>
@@ -80,6 +84,7 @@ export const TaskColumns = ({ tasks }: TaskColumnsProps) => {
                   <TaskCard
                     key={task.id}
                     task={task}
+                    onUpdate={(task) => setUpdateTask(task)}
                     onOpen={(task) => setSelectedTask(task)}
                     onDelete={(task) => setDeleteTask(task)}
                   />
@@ -94,11 +99,28 @@ export const TaskColumns = ({ tasks }: TaskColumnsProps) => {
               onClose={() => setSelectedTask(null)
               }
             />
+            <EditTaskDialog
+              open={!!updateTask}
+              task={updateTask || undefined}
+              onClose={(() => setUpdateTask(null))}
+              onConfirm={() => {
+                if (updateTask) {
+                  onUpdateTask(updateTask);
+                  setUpdateTask(null);
+                }
+              }}
+            />
             <DeleteTaskDialog
               open={!!deleteTask}
               task={deleteTask || undefined}
               onClose={() => setDeleteTask(null)}
-              onConfirm={handleDelete}
+              onConfirm={() => {
+                if (deleteTask) {
+                  onDeleteTask(deleteTask);
+                  setDeleteTask(null);
+                }
+
+              }}
             />
           </div>
         ))}

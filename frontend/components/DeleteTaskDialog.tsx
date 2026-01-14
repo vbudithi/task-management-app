@@ -21,13 +21,13 @@ type Props = {
 export default function DeleteTaskDialog({ task, onConfirm, open, onClose }: Props) {
     return (
         <AlertDialog open={open} onOpenChange={onClose}>
-            <AlertDialogContent>
+            <AlertDialogContent >
                 <AlertDialogHeader>
                     <AlertDialogTitle> Delete Task </AlertDialogTitle>
                     <AlertDialogDescription>
                         Are you sure you want to delete {""}
                         <span className="font-semibold">{task?.title}</span>
-                        This action cannot be undone
+                        {""}. This action cannot be undone.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

@@ -1,4 +1,9 @@
-export const dateFormat = (value?: string | null) => {
-    if (!value) return '-'
-    return new Date(value).toISOString().split("T")[0]
+/**
+ * Format date as MM/DD/YYYY (US format)
+ */
+export function dateFormat(date?: string | null): string {
+    if (!date) return "—";
+
+    const d = new Date(date);
+    return d.toLocaleDateString("en-US");
 }

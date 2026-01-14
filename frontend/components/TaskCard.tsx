@@ -9,21 +9,28 @@ type Props = {
   task: Task;
   onOpen: (task: Task) => void;
   onDelete: (task: Task) => void;
+  onUpdate: (task: Task) => void;
 }
 
-export function TaskCard({ task, onOpen, onDelete }: Props) {
+export function TaskCard({ task, onOpen, onUpdate, onDelete }: Props) {
 
-  const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleUpdate = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
-    onOpen(task)
+    onUpdate(task)
   }
 
   const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
     onDelete(task)
   }
+
+  const handleView = () => {
+    onOpen(task)
+  }
   return (
-    <Card className="p-1.5 w-full shadow-2xs rounded-xl border border-gray-300 hover:shadow-lg transition-all duration-200 cursor-pointer">
+    <Card className="p-1.5 w-full shadow-2xs rounded-xl border border-gray-300 hover:shadow-lg transition-all duration-200 cursor-pointer" tabIndex={-1}
+      onClick={handleView}>
+
       <CardHeader className="space-y-0.5 pb-1">
         <div className="flex items-start justify-between">
           <div>
@@ -57,7 +64,7 @@ export function TaskCard({ task, onOpen, onDelete }: Props) {
           size="sm"
           variant="outline"
           className="flex items-center gap-1 px-2 py-1 text-xs cursor-pointer hover:bg-gray-200"
-          onClick={handleEdit}
+          onClick={handleUpdate}
         >
           <Pencil className="w-4 h-4" /> Edit
         </Button>

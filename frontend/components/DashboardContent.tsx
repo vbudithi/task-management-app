@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
 import { getProfile, logoutUser } from "@/lib/authService";
-import { getAllTasks } from "@/lib/tasks";
+import { deleteTaskById, getAllTasks, updateTaskById } from "@/lib/tasks";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { capitalizeFirst } from "@/utils/string";
@@ -13,12 +13,17 @@ import { Task } from "@/types/taskTypes";
 import { TaskColumns } from "@/components/TaskColumns";
 
 export default function DashboardContent() {
-      const router = useRouter();
-      const [user, setUser] = useState<User | null>(null);
-      const [tasks, setTasks] = useState<Task[]>([]);
-      const [loading, setLoading] = useState(false);
-    
-useEffect(() => {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState<number>(0);
+  const [priority, setPriority] = useState<number>(1);
+  const [dueDate, setDueDate] = useState<string>("")
+
+  useEffect(() => {
     const loadUser = async () => {
       try {
         const res = await getProfile();
@@ -29,11 +34,20 @@ useEffect(() => {
         router.push("/login");
         toast.error("You're not logged in");
         console.error("Not Logged in:", error);
-        
+
       }
     };
     loadUser();
   }, []);
+
+  useEffect(() => {
+    if (dueDate) {
+      setDueDate(dueDate.slice(0, 10));
+    } else {
+      setDueDate("");
+    }
+  }, [dueDate]);
+
 
   useEffect(() => {
     const getUserTasks = async () => {
@@ -68,51 +82,93 @@ useEffect(() => {
     }
   };
 
+  const handleDelete = async (task: Task) => {
+    try {
+      const data = await deleteTaskById(task.id)
+      console.log("api data", data)
+      if (!data || data.length === 0) {
+        toast.error("failed to delete the task");
+        return;
+      }
+      toast.success("Task deleted");
+      setTasks(prev => prev.filter(t => t.id != task.id))
 
-  return(
-    <>
-       {user && (
-            <div className="text-center">
-              <p className="text-lg flex justify-end">
-                  Welcome, 
-                  <span className="font-semibold text-orange-600 ">{capitalizeFirst(user.firstName)} {capitalizeFirst(user.lastName)} </span>
-                  
-              </p>
-              <div className="flex justify-end ">
-                  <Link href="/profile">
-                      <Button className="mr-2 bg-green-700 hover:bg-green-800 text-white cursor-pointer">View Profile</Button>
-                  </Link>
-                    <Button onClick={handleLogout} className="bg-gray-600 text-white cursor-pointer">
-                      {loading ? "Logging out..." : "Logout"}
-                    </Button>
-              </div>
-            </div>
-          )}
-        <div className="text-xl md:text-3xl font-bold md:text-center -translate-y-18 ">Dashboard</div>
+    } catch (error) {
+      console.error("Failed to delete the task", error);
+      toast.error("Something went wrong");
 
-        {/* loading state */}
-            {loading && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {[...Array(3)].map((_, i) => (
-                  <Skeleton key={i} className="h-40 w-full rounded-lg" />
-                  ))}
-            </div>
-            )}  
-
-        {/* No tasks */}
-            {!loading && tasks.length === 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {["To Do", "In Progress", "Done"].map((status) => (
-                <div key={status}>
-                <h3 className="text-xl font-medium mb-2">{status}</h3>
-                <p className="text-sm text-gray-500">No tasks here</p>
-                </div>
-                ))}
-            </div>
-        )}
-
-        {/* Display tasks */}
-            {!loading && tasks.length > 0 && <TaskColumns tasks={tasks} />}
-            </>
-          )
     }
+  }
+
+  const handleUpdate = async (task: Task) => {
+    try {
+      setLoading(true);
+      const payload = {
+        title,
+        description,
+        status,
+        priority,
+        dueDate
+      }
+      const data = await updateTaskById(task.id, payload)
+      console.log("Update Data", data)
+      if (!data || data.length === 0) {
+        toast.error("Failed to update the data");
+        return;
+      }
+      toast.success("Updated Sucessfully");
+
+    } catch (error) {
+      console.error("Failed to update the task", error);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
+  return (
+    <>
+      {user && (
+        <div className="text-center">
+          <p className="text-lg flex justify-end">
+            Welcome,
+            <span className="font-semibold text-orange-600 ">{capitalizeFirst(user.firstName)} {capitalizeFirst(user.lastName)} </span>
+
+          </p>
+          <div className="flex justify-end ">
+            <Link href="/profile">
+              <Button className="mr-2 bg-green-700 hover:bg-green-800 text-white cursor-pointer">View Profile</Button>
+            </Link>
+            <Button onClick={handleLogout} className="bg-gray-600 text-white cursor-pointer">
+              {loading ? "Logging out..." : "Logout"}
+            </Button>
+          </div>
+        </div>
+      )}
+      <div className="text-xl md:text-3xl font-bold md:text-center -translate-y-18 ">Dashboard</div>
+
+      {/* loading state */}
+      {loading && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full rounded-lg" />
+          ))}
+        </div>
+      )}
+
+      {/* No tasks */}
+      {!loading && tasks.length === 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {["To Do", "In Progress", "Done"].map((status) => (
+            <div key={status}>
+              <h3 className="text-xl font-medium mb-2">{status}</h3>
+              <p className="text-sm text-gray-500">No tasks here</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Display tasks */}
+      {!loading && tasks.length > 0 && <TaskColumns tasks={tasks} onDeleteTask={handleDelete} onUpdateTask={handleUpdate} />}
+    </>
+  )
+}
