@@ -17,6 +17,12 @@ export default function ProfileInfo() {
     const [username, setUsername] = useState("")
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(true)
+    const [initialState, setInitialState] = useState<{
+        firstName: string,
+        lastName: string;
+        username: String;
+        email: string;
+    } | null>(null);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -29,6 +35,18 @@ export default function ProfileInfo() {
                 setUsername(data.username);
                 setEmail(data.email);
                 console.log(data)
+
+                const snapshot = {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    username: data.username,
+                    email: data.email
+                }
+                setInitialState(snapshot)
+                setFirstName(snapshot.firstName)
+                setLastName(snapshot.lastName)
+                setUsername(snapshot.username)
+                setEmail(snapshot.email)
             } catch (error) {
                 router.push("/login");
                 console.error("[ProfilePage] Could not load profile details:", error);
@@ -38,16 +56,32 @@ export default function ProfileInfo() {
             }
         }
         fetchProfile();
+
     }, []);
+
+
+    const isDirty =
+        !!initialState && (
+            firstName != initialState.firstName ||
+            lastName != initialState.lastName ||
+            email != initialState.email
+        )
 
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!isDirty) return;
         setLoading(true);
         try {
             await updateProfile({ firstName, lastName, email });
             toast.dismiss();
             toast.success("Your profile has been updated", {
                 className: "toast-progress",
+            });
+            setInitialState({
+                firstName,
+                lastName,
+                username,
+                email,
             });
         } catch (error) {
             console.error("update failed", error);
@@ -56,6 +90,8 @@ export default function ProfileInfo() {
             setLoading(false);
         }
     }
+
+
     return (
         <>
             <div className="mt-10">
@@ -97,12 +133,16 @@ export default function ProfileInfo() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button variant="outline" disabled={loading} className=" w-full cursor-pointer" >
-                            {loading ? "updating..." : "Update"}
+                        <Button
+                            type="submit"
+                            disabled={!isDirty || loading}
+                            className={"w-full disabled:opacity-50 disabled:cursor-not-allowed"}
+                        >
+                            {loading ? "Updating..." : "Update"}
                         </Button>
                     </CardFooter>
                 </form>
-            </Card>
+            </Card >
         </>
     )
 }

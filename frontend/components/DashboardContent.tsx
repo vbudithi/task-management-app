@@ -11,6 +11,7 @@ import type { User } from "@/types/user";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Task } from "@/types/taskTypes";
 import { TaskColumns } from "@/components/TaskColumns";
+import { toApiDate } from "../utils/dateFormat";
 
 export default function DashboardContent() {
   const router = useRouter();
@@ -104,11 +105,11 @@ export default function DashboardContent() {
     try {
       setLoading(true);
       const payload = {
-        title,
-        description,
-        status,
-        priority,
-        dueDate
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        priority: task.priority,
+        dueDate: task.dueDate ? toApiDate(dueDate) : null,
       }
       const data = await updateTaskById(task.id, payload)
       console.log("Update Data", data)
@@ -118,6 +119,7 @@ export default function DashboardContent() {
       }
       toast.success("Updated Sucessfully");
 
+      setTasks(prev => (prev.map(t => (t.id === task.id ? { ...t, ...task } : t))))
     } catch (error) {
       console.error("Failed to update the task", error);
       toast.error("Something went wrong");

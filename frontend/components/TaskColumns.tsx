@@ -103,11 +103,13 @@ export const TaskColumns = ({ tasks, onDeleteTask, onUpdateTask }: TaskColumnsPr
               open={!!updateTask}
               task={updateTask || undefined}
               onClose={(() => setUpdateTask(null))}
-              onConfirm={() => {
-                if (updateTask) {
-                  onUpdateTask(updateTask);
-                  setUpdateTask(null);
-                }
+              onConfirm={(updatedValues) => {
+                if (!updateTask) return;
+                onUpdateTask({
+                  ...updateTask,
+                  ...updatedValues
+                })
+                setUpdateTask(null);
               }}
             />
             <DeleteTaskDialog

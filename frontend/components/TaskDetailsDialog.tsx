@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
 import { Task } from '@/types/taskTypes';
-import { dateFormat } from './dateFormat';
+import { dateFormat } from '../utils/dateFormat';
 
 type Props = {
     task?: Task;

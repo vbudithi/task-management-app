@@ -3,7 +3,7 @@ import { Task } from '@/types/taskTypes';
 import { Button } from './ui/button';
 import { Badge } from "./ui/badge";
 import { Pencil, Trash2 } from "lucide-react";
-import { dateFormat } from '@/components/dateFormat'
+import { dateFormat } from '@/utils/dateFormat'
 
 type Props = {
   task: Task;

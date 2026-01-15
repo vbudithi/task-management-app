@@ -4,40 +4,67 @@ import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Textarea } from "@/components/ui/textarea"
 import { useState, useEffect } from 'react';
-import { dateFormat } from './dateFormat';
+import { toInputDate } from '../utils/dateFormat';
 
 type Props = {
     task?: Task;
     open: boolean;
     onClose: () => void;
-    onConfirm: () => void;
+    onConfirm: (updated: Partial<Task>) => void;
 }
 export default function EditTaskDialog({ task, open, onClose, onConfirm }: Props) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState<number>(0);
     const [priority, setPriority] = useState<number>(1);
-    const [dueDate, setDueDate] = useState<string>("")
+    const [dueDate, setDueDate] = useState<string>("");
+    const [initialState, setInitialState] = useState<{
+        title: string;
+        description: string;
+        status: number;
+        priority: number;
+        dueDate: string;
+    } | null>(null);
 
     useEffect(() => {
-        if (task) {
-            setTitle(task.title);
-            setDescription(String(task.description ?? ""));
-            setStatus(task.status ?? 0);
-            setPriority(task.priority ?? 1);
-            setDueDate(task.dueDate ?? "");
+        if (!task) return;
+        const formattedDate = task.dueDate ? toInputDate(task.dueDate) : "";
+        const snapshot = {
+            title: task.title,
+            description: task.description ?? "",
+            status: task.status ?? 0,
+            priority: task.priority ?? 1,
+            dueDate: formattedDate
         }
-    }, [task])
 
-    useEffect(() => {
-        if (task?.dueDate) {
-            const formatted = dateFormat(task.dueDate);
-            setDueDate(formatted);
-        }
+        setInitialState(snapshot);
+        setTitle(snapshot.title);
+        setDescription(snapshot.description);
+        setStatus(snapshot.status);
+        setPriority(snapshot.priority);
+        setDueDate(snapshot.dueDate);
     }, [task]);
 
+    const isDirty =
+        !!initialState && (
+            title != initialState.title ||
+            description != initialState.description ||
+            status != initialState.status ||
+            priority != initialState.priority ||
+            dueDate != initialState.dueDate
+        )
 
     if (!task) return null;
+    const handleSave = () => {
+        onConfirm({
+            title,
+            description,
+            status,
+            priority,
+            dueDate
+        })
+    }
+
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-md">
@@ -78,7 +105,7 @@ export default function EditTaskDialog({ task, open, onClose, onConfirm }: Props
                     </div>
 
                     <Input
-                        type="text"
+                        type="date"
                         value={dueDate}
                         placeholder="MM/DD/YYYY"
                         onChange={(e) => setDueDate(e.target.value)}
@@ -91,7 +118,11 @@ export default function EditTaskDialog({ task, open, onClose, onConfirm }: Props
                         onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button onClick={onConfirm}>
+                    <Button
+                        onClick={handleSave}
+                        disabled={!isDirty}
+                        className={!isDirty ? "opacity-50 cursor-not-allowed" : ""}
+                    >
                         Save
                     </Button>
                 </DialogFooter>
