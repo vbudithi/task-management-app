@@ -94,19 +94,8 @@ namespace TaskManagement.API.Controllers
             _db.Tasks.Add(task);
             await _db.SaveChangesAsync();
 
-            return Ok(new
-            {
-                message = "Task Created",
-                task = new
-                {
-                    task.Title,
-                    task.Description,
-                    task.Priority,
-                    task.Status,
-                    task.CreatedAt,
-                    task.DueDate
-                }
-            });
+            return Ok(task);
+            
         }
 
         //PUT: api/tasks/id

@@ -3,26 +3,24 @@ import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
 import { getProfile, logoutUser } from "@/lib/authService";
-import { deleteTaskById, getAllTasks, updateTaskById } from "@/lib/tasks";
+import { createTask, deleteTaskById, getAllTasks, updateTaskById } from "@/lib/tasks";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { capitalizeFirst } from "@/utils/string";
 import type { User } from "@/types/user";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Task } from "@/types/taskTypes";
+import { CreateTaskDto, Task } from "@/types/taskTypes";
 import { TaskColumns } from "@/components/TaskColumns";
 import { toApiDate } from "../utils/dateFormat";
+import CreateTaskDialog from "./CreateTaskDialog";
 
 export default function DashboardContent() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<number>(0);
-  const [priority, setPriority] = useState<number>(1);
   const [dueDate, setDueDate] = useState<string>("")
+  const [createOpen, setCreateOpen] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -35,7 +33,6 @@ export default function DashboardContent() {
         router.push("/login");
         toast.error("You're not logged in");
         console.error("Not Logged in:", error);
-
       }
     };
     loadUser();
@@ -48,7 +45,6 @@ export default function DashboardContent() {
       setDueDate("");
     }
   }, [dueDate]);
-
 
   useEffect(() => {
     const getUserTasks = async () => {
@@ -97,7 +93,6 @@ export default function DashboardContent() {
     } catch (error) {
       console.error("Failed to delete the task", error);
       toast.error("Something went wrong");
-
     }
   }
 
@@ -127,6 +122,27 @@ export default function DashboardContent() {
       setLoading(false);
     }
   }
+
+  const handleCreate = async (payload: CreateTaskDto) => {
+    try {
+      setLoading(true);
+      const data = await createTask(payload);
+      console.log("postdata", data)
+      if (!data) {
+        toast.error("Failed to create the data");
+        return;
+      }
+
+      setTasks((prev) => [data, ...prev])
+      toast.success("Created Sucessfully");
+    } catch (error) {
+      console.error("Failed to create the task", error);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <>
       {user && (
@@ -134,7 +150,6 @@ export default function DashboardContent() {
           <p className="text-lg flex justify-end">
             Welcome,
             <span className="font-semibold text-orange-600 ">{capitalizeFirst(user.firstName)} {capitalizeFirst(user.lastName)} </span>
-
           </p>
           <div className="flex justify-end ">
             <Link href="/profile">
@@ -146,7 +161,17 @@ export default function DashboardContent() {
           </div>
         </div>
       )}
-      <div className="text-xl md:text-3xl font-bold md:text-center -translate-y-18 ">Dashboard</div>
+      <div className="text-xl md:text-3xl font-bold md:text-center -translate-y-18 ">
+        Dashboard
+      </div>
+
+      <div className=" mt-14 flex justify-end md:mt-2 md:justify-center -translate-y-18 ">
+        <Button
+          className=" bg-violet-500 hover:bg-violet-700 text-white cursor-pointer"
+          onClick={() => setCreateOpen(true)}> + Create Task</Button>
+      </div>
+
+
 
       {/* loading state */}
       {loading && (
@@ -171,6 +196,8 @@ export default function DashboardContent() {
 
       {/* Display tasks */}
       {!loading && tasks.length > 0 && <TaskColumns tasks={tasks} onDeleteTask={handleDelete} onUpdateTask={handleUpdate} />}
+
+      <CreateTaskDialog open={createOpen} onClose={() => setCreateOpen(false)} onCreate={handleCreate} />
     </>
   )
 }

@@ -30,7 +30,7 @@ export const TaskColumns = ({ tasks, onDeleteTask, onUpdateTask }: TaskColumnsPr
   return (
     <>
       {/* MOBILE VIEW */}
-      <div className="flex md:hidden overflow-x-auto gap-4 px-2 h-150">
+      <div className="flex md:hidden overflow-x-auto gap-4 px-2 h-128">
         {statuses.map((status) => (
           <div
             key={status}
@@ -67,7 +67,7 @@ export const TaskColumns = ({ tasks, onDeleteTask, onUpdateTask }: TaskColumnsPr
       </div>
 
       {/* DESKTOP VIEW */}
-      <div className="hidden md:flex justify-center px:2 gap-20 -mt-12 h-180">
+      <div className="hidden md:flex justify-center px:2 gap-20 -mt-12 h-170">
         {statuses.map((status) => (
           <div key={status} className="min-w-70 shrink-0 flex flex-col items-center bg-white rounded-lg p-3 border shadow-sm">
             <h3 className=

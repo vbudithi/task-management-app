@@ -46,7 +46,7 @@ export async function getTaskByStatus(status: number) {
 /**
  * POST: /api/task
  */
-export async function postTask(payload: CreateTaskDto) {
+export async function createTask(payload: CreateTaskDto) {
   try {
     const res = await apiClient.post(`/task`, payload, {
       headers: {
@@ -94,3 +94,4 @@ export async function deleteTaskById(id: number) {
     throw err;
   }
 }
+
