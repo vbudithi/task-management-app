@@ -147,7 +147,7 @@ export default function DashboardContent() {
     <>
       {user && (
         <div className="text-center">
-          <p className="text-lg flex justify-end">
+          <p className="text-lg flex justify-end -mt-3">
             Welcome,
             <span className="font-semibold text-orange-600 ">{capitalizeFirst(user.firstName)} {capitalizeFirst(user.lastName)} </span>
           </p>
@@ -161,17 +161,15 @@ export default function DashboardContent() {
           </div>
         </div>
       )}
-      <div className="text-xl md:text-3xl font-bold md:text-center -translate-y-18 ">
+      <h1 className="md:text-3xl font-bold md:text-center -translate-y-18 ">
         Dashboard
-      </div>
+      </h1>
 
-      <div className=" mt-14 flex justify-end md:mt-2 md:justify-center -translate-y-18 ">
+      <div className=" mt-14 flex justify-end md:mt-7 md:justify-center -translate-y-18 ">
         <Button
           className=" bg-violet-500 hover:bg-violet-700 text-white cursor-pointer"
           onClick={() => setCreateOpen(true)}> + Create Task</Button>
       </div>
-
-
 
       {/* loading state */}
       {loading && (
