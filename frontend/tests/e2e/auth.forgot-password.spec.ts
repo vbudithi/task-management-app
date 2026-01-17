@@ -15,7 +15,7 @@ test("user request a password reset", async ({ page }) => {
     //click forgot-password
     await page.getByRole('link', { name: /Forgot Password/i }).click();
 
-    // Assert we are on forgot-password page
+    // Confirm navigation to forgot-password page
     await expect(page).toHaveURL(/\/forgot-password/);
 
     //fill email
