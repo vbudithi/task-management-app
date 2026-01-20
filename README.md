@@ -68,7 +68,7 @@ A production‑grade Task Management system featuring real‑time task transitio
 ## AI Integration screenshots
 
 ![AI Suggestion for Create Task](/frontend/public/screenshots/AiSuggestion_create_task.png)
-![AI Suggestion for Edit Task](/frontend/public/screenshots/edit.png)
+![AI Suggestion for Edit Task](/frontend/public/screenshots/AiSuggestion_edit_task.png)
 ![swagger AI Integration](/frontend/public/screenshots/swagger_AiOutput.png)
 ![Python Named Entity Recognition (NER) Integration](/frontend/public/screenshots/Local_python_NER_Integration_dotnet.png)
 
