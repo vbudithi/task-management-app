@@ -1,8 +1,8 @@
 # 🗂️ TaskFlow- Task Management Application
 
-🧑‍💻 **Full‑Stack Development** — Next.js ⚛️ | .NET Web API 🛠️ | SQL Server 🗄️
+🧑‍💻 **Full‑Stack Development** — Next.js ⚛️ | .NET Web API 🛠️ | SQL Server 🗄️ | Python NER 🤖 
 
-A production‑grade Task Management system featuring real‑time task transitions, instant updates across Todo, In‑Progress, and Completed states, secure authentication, and a clean full‑stack architecture.
+A production‑grade Task Management system featuring real‑time task transitions, instant updates across Todo, In‑Progress, and Completed states, secure authentication, and a clean full‑stack architecture. Now enhanced with AI‑powered task insights using a Python‑based Named Entity Recognition (NER) service for automatic priority and due‑date suggestions.
 
 # 🖥️ Frontend — Next.js 
 
@@ -32,6 +32,17 @@ A production‑grade Task Management system featuring real‑time task transitio
   
   • Role-based authorization
 
+# 🤖 AI Layer — Python NER Service
+
+  • Python‑based Named Entity Recognition (NER).
+
+  • Extracts dates and priority‑related keywords, notfies the suggestions through toast and auto‑fills the suggested values into the form, and allows 
+    the user to change them if needed.
+
+  • Provides AI‑generated suggestions to the .NET backend.
+
+  • Consumed by both Create and Edit task flow.
+
 # Frontend - testing
 
   • vitest
@@ -40,7 +51,8 @@ A production‑grade Task Management system featuring real‑time task transitio
   
   • @testing-library/jest-dom
 
-  ### screenshots
+## screenshots
+
 ![Dashboard](/frontend/public/screenshots/dashboard.png)
 ![Login](/frontend/public/screenshots/login.png)
 ![Register](/frontend/public/screenshots/register.png)
@@ -53,24 +65,36 @@ A production‑grade Task Management system featuring real‑time task transitio
 ![swagger](/frontend/public/screenshots/swagger.png)
 ![database](/frontend/public/screenshots/database.png)
 
-### Playwright testing sceenshot (e2e)
+## AI Integration screenshots
+
+![AI Suggestion for Create Task](/frontend/public/screenshots/AiSuggestion_create_task.png)
+![AI Suggestion for Edit Task](/frontend/public/screenshots/edit.png)
+![swagger AI Integration](/frontend/public/screenshots/swagger_AiOutput.png)
+![Python Named Entity Recognition (NER) Integration](/frontend/public/screenshots/Local_python_NER_Integration_dotnet.png)
+
+## Playwright testing sceenshot (e2e)
+
 ![login/register/forgot-password](/frontend/public/screenshots/e2e_test_login_reg_forgotPass.png)
 
+## 📦 Setup
 
-### 📦 Setup
-
+### 🚀 Frontend(Nextjs)
 ```bash
-
---frontend
 git clone https://github.com/vbudithi/task-management-app.git
-cd frontend
+cd task-management-app/frontend
 
 npm install
 npm run dev
-
---backend
-git clone https://github.com/your-username/task-management-app.git
+```
+### 🧩Backend(.NET API)
+```bash
+git clone https://github.com/vbudithi/task-management-app.git
 cd backend/TaskManagement.API
 
 dotnet restore
 dotnet run
+```
+### 🤖Python NER Server
+```bash
+cd ai-ner-server
+python ner_server.py
