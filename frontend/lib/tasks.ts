@@ -1,4 +1,4 @@
-import { CreateTaskDto } from "@/types/taskTypes";
+import { AIAnalyzedtaskDto, AnalyzedTaskDto, CreateTaskDto } from "@/types/taskTypes";
 import apiClient from "./apiClient";
 
 /**
@@ -62,6 +62,7 @@ export async function createTask(payload: CreateTaskDto) {
   }
 }
 
+
 /**
  * PUT: /api/task/:id
  */
@@ -77,6 +78,25 @@ export async function updateTaskById(id: number, payload: any) {
     return res.data;
   } catch (err) {
     console.error(`Error updating task ${id}:`, err);
+    throw err;
+  }
+}
+
+/**
+ * POST: /api/task/analyze
+ */
+export async function analyzeTask(payload: CreateTaskDto): Promise<AnalyzedTaskDto> {
+  try {
+    const res = await apiClient.post(`/task/analyze`, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("response from POST /task/analyze:", res.data);
+    return res.data;
+  } catch (err) {
+    console.error("Error analyzing the task:", err);
     throw err;
   }
 }

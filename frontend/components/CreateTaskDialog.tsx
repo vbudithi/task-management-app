@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from './ui/dialog';
 import { CreateTaskDto, Task } from '@/types/taskTypes';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
+import { analyzeTask } from '@/lib/tasks';
+import toast from 'react-hot-toast';
 
 type Props = {
     open: boolean;
@@ -17,32 +19,96 @@ export default function CreateTaskDialog({ open, onClose, onCreate }: Props) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState(0);
-    const [priority, setPriority] = useState(1);
-    const [dueDate, setDueDate] = useState("");
-
+    const [priority, setPriority] = useState<number | undefined>(undefined);
+    const [dueDate, setDueDate] = useState<string>("");
+    const [aiSuggestions, setAiSuggestions] = useState<{ suggestedPriority: number, suggestedDueDate: string | null } | null>(null)
+    const debounceRef = useRef<any>(null);
     const canSave = title.trim().length > 0;
 
+    const resetForm = () => {
+        setTitle("");
+        setDescription("");
+        setStatus(0);
+        setPriority(undefined);
+        setDueDate("");
+    }
     const handleSave = () => {
         onCreate({
             title: title.trim(),
             description,
             status,
-            priority,
+            priority: priority ?? 1,
             dueDate: dueDate || null
         });
-
-        //resetform
-        setTitle("");
-        setDescription("");
-        setStatus(0);
-        setPriority(1);
-        setDueDate("");
-
+        resetForm();
         onClose();
     }
 
+    const handleOpenChange = (isOpen: boolean) => {
+        if (!isOpen) {
+            resetForm();
+            onClose();
+        }
+    }
+
+    const handleDescriptionChange = (desc: string) => {
+        setDescription(desc);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+
+        debounceRef.current = setTimeout(async () => {
+            if (!desc.trim()) return;
+
+            try {
+                const payload: CreateTaskDto = {
+                    title,
+                    description: desc,
+                    status,
+                    priority: null,
+                    dueDate: null
+                }
+                const res = await analyzeTask(payload);
+                setAiSuggestions(res.aiInsights)
+                console.log("Data", res)
+
+            } catch (err) {
+                console.error("AI analysis failed", err)
+            }
+
+        }, 1000);
+    };
+
+    useEffect(() => {
+        if (!aiSuggestions) return;
+
+        if (!priority && aiSuggestions?.suggestedPriority) {
+            setPriority(aiSuggestions.suggestedPriority)
+            const label = ["Low", "Medium", "High"][aiSuggestions.suggestedPriority - 1]
+            toast(`AI Suggested priority : ${label}`, {
+                duration: 5500,
+                style: {
+                    top: 75,
+                    background: "#333",
+                    color: "#fff",
+                },
+
+            });
+        }
+        if (!dueDate && aiSuggestions?.suggestedDueDate) {
+            setDueDate(aiSuggestions.suggestedDueDate.split("T")[0])//
+            toast(`AI Suggested DueDate: ${new Date(aiSuggestions.suggestedDueDate).toLocaleDateString()}`, {
+                duration: 5500,
+                style: {
+                    top: 105,
+                    background: "#333",
+                    color: "#fff",
+                },
+            })
+        }
+
+    }, [aiSuggestions])
+
     return (
-        <Dialog open={open} onOpenChange={onClose}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle className="font-bold"> Create Task</DialogTitle>
@@ -57,7 +123,7 @@ export default function CreateTaskDialog({ open, onClose, onCreate }: Props) {
                     <Textarea
                         placeholder="description"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(e) => handleDescriptionChange(e.target.value)}
                     />
                     <div className="grid grid-cols-2 gap-3">
                         <select
@@ -85,10 +151,7 @@ export default function CreateTaskDialog({ open, onClose, onCreate }: Props) {
                     />
                 </div>
                 <DialogFooter className="mt-4">
-                    <Button
-                        variant="outline"
-                        onClick={onClose}
-                        className="cursor-pointer">
+                    <Button variant="outline" onClick={() => handleOpenChange(false)}>
                         Cancel
                     </Button>
                     <Button
