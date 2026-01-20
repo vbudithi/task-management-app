@@ -120,7 +120,11 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
+builder.Services.AddHttpClient<ITaskAiService, TaskAiService>();
 
+//logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 // Configure CORS
 builder.Services.AddCors(options =>

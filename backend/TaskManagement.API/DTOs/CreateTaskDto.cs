@@ -14,7 +14,7 @@ namespace TaskManagement.API.DTOs
         public required Models.TaskStatus? Status { get; set; }
 
         [Range(1, 3, ErrorMessage = "Priority must be between 1 and 3")]
-        public int Priority { get; set; } = 1;
+        public int? Priority { get; set; } = 1;
 
         public DateTime? DueDate {get;set;}
     }
