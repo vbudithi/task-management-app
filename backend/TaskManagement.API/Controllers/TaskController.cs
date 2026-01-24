@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TaskManagement.API.Data;
 using TaskManagement.API.DTOs;
+using TaskManagement.API.ML.Services;
 using TaskManagement.API.Models;
 using TaskManagement.API.Services;
 
@@ -14,12 +16,14 @@ namespace TaskManagement.API.Controllers
         private readonly ITaskService _taskService;
         private readonly ITaskAiService _taskAiService;
         private readonly AppDbContext _db;
+        private readonly IMLService _mlService;
 
-        public TaskController(AppDbContext db, ITaskService taskService, ITaskAiService taskAiService)
+        public TaskController(AppDbContext db, ITaskService taskService, ITaskAiService taskAiService, IMLService mlService)
         {
             _taskService = taskService;
             _db = db;
             _taskAiService = taskAiService;
+            _mlService = mlService;
         }
 
         //GET: api/tasks
@@ -81,15 +85,23 @@ namespace TaskManagement.API.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
 
+            int aiPriority = await _mlService.PredictPriorityAsync(createDto.Title, createDto.Description);
+            var userPriority = createDto.Priority.HasValue && createDto.Priority.Value>=1? createDto.Priority.Value: (int?)null;
+            var finalPriority = userPriority ?? aiPriority;
+
+            var finalStatus = createDto.Status.HasValue ? createDto.Status.Value: Models.TaskStatus.Todo;
             var task = new TaskItem
             {
                 Title = createDto.Title,
                 Description = createDto.Description,
-                Priority = createDto.Priority,
-                Status = createDto.Status ?? Models.TaskStatus.Todo,
+                Priority = finalPriority,
+                Status =finalStatus,
                 CreatedAt = DateTime.UtcNow,
                 UserId = int.Parse(userId),
-                DueDate = createDto.DueDate
+                DueDate = createDto.DueDate,
+                IsLabeled = userPriority.HasValue,
+                AiSuggested = !userPriority.HasValue
+
             };
 
             _db.Tasks.Add(task);

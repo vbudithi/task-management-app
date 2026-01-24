@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskManagement.API.Auth;
 using TaskManagement.API.Data;
+using TaskManagement.API.ML.Services;
+using TaskManagement.API.ML.Training;
 using TaskManagement.API.Models;
 using TaskManagement.API.Services;
 
@@ -11,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+BootstrapTrainer.CreateStarterModel();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -121,6 +124,7 @@ builder.Services.AddSingleton<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddHttpClient<ITaskAiService, TaskAiService>();
+builder.Services.AddScoped<IMLService, MLService>();
 
 //logging
 builder.Logging.ClearProviders();

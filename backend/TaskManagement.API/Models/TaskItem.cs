@@ -18,5 +18,7 @@ namespace TaskManagement.API.Models
         public int? UserId { get; set; }
         public User? User { get; set; }
         public DateTime? DueDate { get; set; }
+        public bool AiSuggested { get; set; }
+        public bool IsLabeled { get; set; }
     }
 }

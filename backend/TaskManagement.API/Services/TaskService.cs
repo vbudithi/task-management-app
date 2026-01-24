@@ -34,7 +34,7 @@ namespace TaskManagement.API.Services
             {
                 Title = createDto.Title,
                 Description = createDto.Description,
-                Priority = createDto.Priority,
+                Priority = createDto?.Priority,
                 Status = createDto.Status ?? Models.TaskStatus.Todo,
                 CreatedAt = DateTime.UtcNow,
                 UserId= userId,
